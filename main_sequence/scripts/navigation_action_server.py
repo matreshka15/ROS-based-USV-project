@@ -22,7 +22,7 @@ class Route:
         self.yaw = 0
         self.distance = 0
         self.EndOfNav = 0           
-route = Route()
+prvRoute = Route()
 
 #define general function
 def acquire_mapdata():
@@ -97,8 +97,8 @@ def navigation(goal):
             if distance >=255:
                 distance = 255
             angle =  AziFromPos.angleFromCoordinate(nav_action_data.longitude,nav_action_data.latitude,Mapdata[nextPoint][0],Mapdata[nextPoint][1])
-            route.yaw = round(angle)
-            route.distance = round(distance)
+            prvRoute.yaw = round(angle)
+            prvRoute.distance = round(distance)
             if(distance > MaxDistance):
                 #如果超出范围
                 pass 
@@ -106,7 +106,7 @@ def navigation(goal):
             elif(nextPoint == len(Mapdata.keys())):
                 #未超出范围，则已达到目标点。
                 nextPoint = nextPoint
-                Route.EndOfNav = 1
+                prvRoute.EndOfNav = 1
                 server.set_succeeded(nav_result)
                 while not server.is_preempt_requested():
                         pass
@@ -115,7 +115,7 @@ def navigation(goal):
                         break
                 break
             else:
-                Route.EndOfNav = 0
+                prvRoute.EndOfNav = 0
                 nextPoint += 1
                     
             nav_feedback.current_index = nextPoint
@@ -123,9 +123,9 @@ def navigation(goal):
             nav_feedback.current_longitude = nav_action_data.longitude
             server.publish_feedback(nav_feedback)
             
-            nav_route.EndOfNav = Route.EndOfNav
-            nav_route.nav_yaw = Route.yaw
-            nav_route.nav_distance = Route.distance
+            nav_route.EndOfNav = prvRoute.EndOfNav
+            nav_route.nav_yaw = prvRoute.yaw
+            nav_route.nav_distance = prvRoute.distance
             pub.publish(nav_route)
             rate.sleep()
                 #发现的问题：一个串口在同一时间只能在一个脚本里打开
