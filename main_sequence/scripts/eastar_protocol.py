@@ -2,7 +2,7 @@
 import rospy
 import serial
 #message type:include almost all GPS\Imu data needed
-from main_sequence.msg import attitude
+from main_sequence.msg import *
 #configuration
 baudrate = 115200
 frame_length = 22
@@ -20,9 +20,28 @@ class attitude_buff():
 	dataProcessed = 0
 	control_mode = 0
 
-#systhesis usart incoming data function
-def sysnthesis_data():
-	pass
+
+def callback(Route):
+        sendFile = list()
+        sumup = 0
+        for cnt in range(20):
+        sendFile.append(0) #初始化数组
+        sendFile[0]=0x63
+        sendFile[1]=0x73
+        sendFile[2]=(Route.yaw&0xff00)>>8
+        sendFile[3]=Route.yaw&0xff
+        sendFile[4]=(Route.distance&0xff00)>>8
+        sendFile[5]=Route.distance&0xff
+        sendFile[6]=(Route.EndOfNav << 7)&0xff
+        #这里用来后续填充
+        for cnt in range(17):
+        sumup+=sendFile[2+cnt]
+        sumup = sumup & 0xff
+        sendFile[19] = sumup
+        sendBytes = bytes()
+        for cnt in range(20):
+        sendBytes += bytes([sendFile[cnt]])
+        ser.write(sendBytes)	
 
 #initialize data needed
 revData = []
@@ -35,14 +54,14 @@ for cnt in range(frame_length):
 	revData.append(0)
 	int_revData.append(0)
 
+
 if __name__ == '__main__':
 	try:
 		pub = rospy.Publisher('attitude_info',attitude,queue_size=10)
-		rospy.init_node('attitude_sysnthesis')
+		rospy.init_node('serial_port_hub',anonymous=True)
+		rospiy.Subscriber('navigation_data_publisher',route,callback)
 		rate = rospy.Rate(5) #5Hz
-		ser = serial.Serial('/dev/ttyUSB0',baudrate)
-		current_time = rospy.get_time()
-		print(current_time)
+		ser = serial.Serial('/dev/ttyAMA0',baudrate)
 		while not rospy.is_shutdown():
 			revData[0] = ser.read(1)
 			one_frame_received = 0
