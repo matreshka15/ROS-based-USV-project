@@ -109,10 +109,10 @@ def navigation(goal):
                 prvRoute.EndOfNav = 1
                 server.set_succeeded(nav_result)
                 while not server.is_preempt_requested():
-                        pass
+                    pass
                 else:
-                        server.set_preempted(nav_result,'GPS Navigation Halt')
-                        break
+                    server.set_preempted(nav_result,'GPS Navigation Halt')
+                    break
                 break
             else:
                 prvRoute.EndOfNav = 0
@@ -127,7 +127,9 @@ def navigation(goal):
             nav_route.nav_yaw = prvRoute.yaw
             nav_route.nav_distance = prvRoute.distance
             pub.publish(nav_route)
-            rate.sleep()
+    else:
+        print("GPS not fixed")
+    rate.sleep()
                 #发现的问题：一个串口在同一时间只能在一个脚本里打开
                 #那么串口的收发都要经过同一个脚本！
                 #把route写成一个msg文件,然后这个脚本里还要再加一个publisher!
