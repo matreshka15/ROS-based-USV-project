@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
 NAME = 'navigation_action'
 FILE_LOCATION = '../LatLong.txt'
-import sys
-sys.path.append('../src')
-import AziFromPos
+from library import AziFromPos
 import actionlib
 from main_sequence.msg import *
 import rospy
