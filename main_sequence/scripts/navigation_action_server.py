@@ -21,9 +21,9 @@ class Route:
         distance = 0#单位：厘米,u16型数据
         EndOfNav = 0#导航结束标志位
         def __init__(self):
-            self.yaw = 0
-            self.distance = 0
-            self.EndOfNav = 0
+                self.yaw = 0
+                self.distance = 0
+                self.EndOfNav = 0
 route = Route()
 
 #define general function
@@ -35,13 +35,13 @@ def acquire_mapdata():
 			for line in f:
 				startIndex = line.find(':')
 				endIndex = line.find(',')
-            			name = int(line[:startIndex])
+				name = int(line[:startIndex])
 				Position0 = float(line[startIndex+1:endIndex])
 				startIndex = endIndex
 				line = line[endIndex+1:]
 				endIndex = line.find(',')
 				Position1 = float(line[:endIndex])
-				Mapdata[name] = [Position0,Position1]
+                                Mapdata[name] = [Position0,Position1]
 			for key in Mapdata.keys():
 				print("Point#%d:%s"%(key,str(Mapdata[key])))
 			print("%d Points In Total."%len(Mapdata.keys()))
@@ -51,9 +51,7 @@ def acquire_mapdata():
 		print("Map Data Not Found!")
 	return Mapdata
 
-
-        
-            
+       
 #define subscriber of vehicle's attitude
   #define callback of subscriber
 def subscriber_callback(attitude_data):
@@ -113,7 +111,7 @@ def navigation(goal):
                                 Route.EndOfNav = 1
                                 server.set_succeeded(nav_result)
                                 while not server.is_preempt_requested():
-                                    pass
+                                        pass
                                 else:
                                         server.set_preempted(nav_result,'GPS Navigation Halt')
                                         break
