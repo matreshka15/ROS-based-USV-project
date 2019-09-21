@@ -57,9 +57,9 @@ for cnt in range(frame_length):
 
 if __name__ == '__main__':
     try:
-        pub = rospy.Publisher('attitude_info',attitude,queue_size=10)
         rospy.init_node('serial_port_hub',anonymous=True)
-        rospiy.Subscriber('navigation_data_publisher',route,callback)
+        pub = rospy.Publisher('attitude_info',attitude,queue_size=10)
+        rospy.Subscriber('navigation_data_publisher',route,callback)
         rate = rospy.Rate(5) #5Hz
         ser = serial.Serial('/dev/ttyAMA0',baudrate)
         while not rospy.is_shutdown():
