@@ -5,9 +5,6 @@ float64 goal_latitude
 float64 goal_longitude
 ---
 #result
-uint32 final_index
-float64 final_latitude
-float64 final_longitude
 ---
 #feedback
 uint32 current_index
