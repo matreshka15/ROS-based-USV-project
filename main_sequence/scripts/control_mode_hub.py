@@ -10,7 +10,7 @@ def callback(attitude):
 
 
 #this param is used to define the strategy uas will take
-navigationmode = 0
+prvNavmode = 0
 
 if __name__ == '__main__':
     rospy.init_node('control_hub')
@@ -22,7 +22,7 @@ if __name__ == '__main__':
             pass
         elif(control_mode == 1):#自动模式
             goal.control_mode = control_mode
-            goal.navigation_mode = navigationmode
+            goal.navigation_mode = prvNavmode
             client.send_goal(goal)
             #result = client.get_result()
             while True:
