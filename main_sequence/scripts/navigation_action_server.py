@@ -134,9 +134,10 @@ def navigation(goal):
 if __name__ == '__main__':
     rospy.init_node('main_execute_module',anonymous=True)
     #start nav data listener
-    rospiy.Subscriber('nav_action_listener',attitude,subscriber_callback)
+    rospy.Subscriber('nav_action_listener',attitude,subscriber_callback)
     pub = rospy.Publisher('navigation_route',route,queue_size=5)
     rate = rospy.Rate(5) #5Hz
-    server = actionlib.SimpleActionServer('GPS_nav',uas_navigation,navigation,False)
+    server = actionlib.SimpleActionServer('GPS_nav',uas_navigationAction,navigation,False)
     server.start()
+    print("nav_center:all module successfully start up")
     rospy.spin()
