@@ -1,8 +1,6 @@
 #goal
-uint32 navigation_mode
-uint32 initial_index
-float64 goal_latitude
-float64 goal_longitude
+uint8 navigation_mode
+uint8 control_mode
 ---
 #result
 ---

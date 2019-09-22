@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-NAME = 'navigation_action'
 FILE_LOCATION = '../LatLong.txt'
 from library import AziFromPos
 import actionlib
@@ -74,9 +73,9 @@ nav_feedback = uas_navigationFeedback()
 def navigation(goal):
     if(nav_action_data.fixtype):
         MapData = acquire_mapdata()
-        if(goal.mode == mode_start_from_the_beginning):
+        if(goal.navigation_mode == mode_start_from_the_beginning):
             nextPoint = min(Mapdata.keys())
-        elif(goal.mode == mode_start_from_the_nearest):
+        elif(goal.navigation_mode == mode_start_from_the_nearest):
             for key in Mapdata.keys():
                 distance = AziFromPos.distanceFromCoordinate(nav_action_data.longitude,nav_action_data.latitude,Mapdata[key][0],Mapdata[key][1])
                 if(key==1):
@@ -130,10 +129,6 @@ def navigation(goal):
     else:
         print("GPS not fixed")
     rate.sleep()
-                #发现的问题：一个串口在同一时间只能在一个脚本里打开
-                #那么串口的收发都要经过同一个脚本！
-                #把route写成一个msg文件,然后这个脚本里还要再加一个publisher!
-                #SendNavMessege(ser,route)
 
 
 if __name__ == '__main__':

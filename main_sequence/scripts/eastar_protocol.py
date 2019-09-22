@@ -4,9 +4,9 @@ import serial
 #message type:include almost all GPS\Imu data needed
 from main_sequence.msg import *
 #configuration
-baudrate = 115200
 frame_length = 22
-
+baudrate = 115200#以后应归档到一个conf文件里
+SERIALPORT = '/dev/ttyAMA0'#以后应归档到一个conf文件里
 class attitude_buff():
     latitude = 0
     longitude = 0
@@ -63,7 +63,7 @@ if __name__ == '__main__':
         rate = rospy.Rate(5) #5Hz
         print("Initiating phase 1")
         #timeout protection
-        ser = serial.Serial('/dev/ttyAMA0',baudrate,timeout=1)
+        ser = serial.Serial(SERIALPORT,baudrate,timeout=1)
         print(ser)
         portNotFound = 0
         while not rospy.is_shutdown():
