@@ -1,5 +1,5 @@
 # 无人船上位机端程序
-此package为使用ROS为框架开发的无人船上位机程序。目前正在开发阶段，功能尚未完成。
+此package为使用ROS为框架开发的无人船上位机程序。目前正在开发阶段，功能尚未完成。使用ROS的主要目的在于试图消除因不同硬件平台带来的低通用性。在Kinetic、Melodic等版本的ROS上；在Nvidia TX系列、树莓派、PC等Ubuntu系统的平台上无差别运行。
 # 开发环境
 初期在Nvidia TX1开发板上进行开发。(系统：Ubuntu 18.04；ROS版本：melodic)，与ROS kinetic兼容性有待测试。但实际开发过程中发现在Kinetic平台未报错误。
 # 开发进度
