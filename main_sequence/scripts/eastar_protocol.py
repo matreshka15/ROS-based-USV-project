@@ -59,11 +59,22 @@ if __name__ == '__main__':
     try:
         pub = rospy.Publisher('attitude_info',attitude,queue_size=10)
         rospy.init_node('serial_port_hub',anonymous=True)
-        rospiy.Subscriber('navigation_data_publisher',route,callback)
+        rospy.Subscriber('navigation_data_publisher',route,callback)
         rate = rospy.Rate(5) #5Hz
-        ser = serial.Serial('/dev/ttyAMA0',baudrate)
+        print("Initiating phase 1")
+        #timeout protection
+        ser = serial.Serial('/dev/ttyAMA0',baudrate,timeout=1)
+        print(ser)
+        portNotFound = 0
         while not rospy.is_shutdown():
             revData[0] = ser.read(1)
+            if revData[0] == b'' or portNotFound == 0:
+                portNotFound = 1
+                print("No data coming in serial port.")
+                print("Please check port:",ser.name)
+            else:
+                print(revData[0])
+                portNotFound = 0
             one_frame_received = 0
             if(revData[0] == b'0x73'):
                 revData[1] = ser.read(1)
@@ -75,6 +86,7 @@ if __name__ == '__main__':
                         int_revData[cnt] = int.from_bytes(revData[cnt],byteorder='big',signed=False)
             else:
                 pass
+                
             if(one_frame_received == True):
                 #CRCvalidating prosedure
                 sumUp = 0
@@ -84,6 +96,9 @@ if __name__ == '__main__':
                 sumUp = sumUp & 0xff
                 if(sumUp == int_revData[frame_length - 1]):
                     CRC_validation_passed = True
+                else:
+                    CRC_validation_passed = False
+                                        
             if(CRC_validation_passed == True):
                 #Interpret data into NavSatFix
                 attitude_buff.longitude = bytes()
@@ -111,9 +126,9 @@ if __name__ == '__main__':
                 real_attitude.longitude = int.from_bytes(attitude_buff.longitude,byteorder='big',signed=False)/1e7
                 real_attitude.latitude = int.from_bytes(attitude_buff.latitude,byteorder='big',signed=False)/1e7
                 pub.publish(real_attitude)
-            rate.sleep()
+            #rate.sleep()
     except rospy.ROSInterruptException:
         ser.close()
-
+        print("Node shuting down")
 
 
