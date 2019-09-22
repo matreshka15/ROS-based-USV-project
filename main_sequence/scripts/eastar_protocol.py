@@ -68,10 +68,11 @@ if __name__ == '__main__':
         portNotFound = 0
         while not rospy.is_shutdown():
             revData[0] = ser.read(1)
-            if revData[0] == b'' and portNotFound == 0:
-                portNotFound = 1
-                print("No data coming in serial port.")
-                print("Please check port:",ser.name)
+            if revData[0] == b'':
+                if(portNotFound == 0)
+                    portNotFound = 1
+                    print("No data coming in serial port.")
+                    print("Please check port:",ser.name)
             else:
                 portNotFound = 0
             one_frame_received = 0
