@@ -73,7 +73,6 @@ if __name__ == '__main__':
                 print("No data coming in serial port.")
                 print("Please check port:",ser.name)
             else:
-                print(revData[0])
                 portNotFound = 0
             one_frame_received = 0
             if(revData[0] == b'0x73'):
