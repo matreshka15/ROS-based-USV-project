@@ -1,1 +1,3 @@
-main_sequence为树莓派ROS的核心Package
+# 上位机ROS系统的核心Package
+## 说明
+* workingfile/目录下用于存放无人船运行过程中需要的文件，例如：路径的经纬度记录文件、GPS坐标点记录文件等。
