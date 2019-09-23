@@ -4,6 +4,7 @@
 初期在Nvidia TX1开发板上进行开发。(系统：Ubuntu 18.04；ROS版本：melodic)，与ROS kinetic兼容性有待测试。但实际开发过程中发现在Kinetic平台未报错误。
 # 相关问题
 * Nvidia 在TX1开发板上使用USB串口(CH341，/dev/ttyUSB0)时接收到的数据不正确，但串口设置正常。实验相同的硬件连接插在windows平台上可接收到正确数据。
+解决方案：使用TX1开发板上的ttyTHS2串口进行数据通信。ttyTHS1和ttyTHS3分别是控制台串口和蓝牙模块，不宜使用。
 # 开发进度
 ## main_sequence package
 包内主要涵盖：路径规划、上位机与下位机的通信（基于Eastar protocol协议，若需要协议框图请联系开发者）
