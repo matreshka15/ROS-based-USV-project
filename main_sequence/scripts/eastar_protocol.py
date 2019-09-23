@@ -3,10 +3,10 @@ import rospy
 import serial
 #message type:include almost all GPS\Imu data needed
 from main_sequence.msg import *
+from variable import *
 #configuration
 frame_length = 22
-baudrate = 115200#以后应归档到一个conf文件里
-SERIALPORT = '/dev/ttyAMA0'#以后应归档到一个conf文件里
+
 class attitude_buff():
     latitude = 0
     longitude = 0
