@@ -60,35 +60,37 @@ if __name__ == '__main__':
         pub = rospy.Publisher('attitude_info',attitude,queue_size=10)
         rospy.init_node('serial_port_hub',anonymous=True)
         rospy.Subscriber('navigation_data_publisher',route,callback)
-        rate = rospy.Rate(5) #5Hz
+        rate = rospy.Rate(10) #5Hz
         print("Initiating phase 1")
         #timeout protection
         ser = serial.Serial(SERIALPORT,baudrate,timeout=1)
         print(ser)
         portNotFound = 0
         while not rospy.is_shutdown():
-            revData[0] = ser.read(1)
-            if revData[0] == b'':
-                if(portNotFound == 0):
-                    portNotFound = 1
-                    print("No data coming in serial port.")
-                    print("Please check port:",ser.name)
-            else:
-                portNotFound = 0
             one_frame_received = 0
-            if(revData[0] == b'0x73'):
-                revData[1] = ser.read(1)
-                if(revData[1] ==b'0x63'):
-                    for cnt in range(frame_length - 2):
-                        revData[2+cnt] = ser.read(1)
+            ser.flushInput()
+            for cnt in range(frame_length):
+                revData[0] = ser.read(1)
+                if revData[0] == b'':
+                    if(portNotFound == False):
+                        portNotFound = True
+                        print("No data coming in serial port.")
+                        print("Please check port:",ser.name)
+                elif revData[0] == b's':
+                    portNotFound = False
+                    for cnt2 in range(frame_length - 1):
+                        revData[1+cnt2] = ser.read(1)#Byte型
+                    if(b's' in revData and b'c' in revData[2:]):
+                        break
+                    for cnt3 in range(frame_length):#int型
+                        int_revData[cnt3] = int.from_bytes(revData[cnt3],byteorder='big',signed=False)
                     one_frame_received = 1
-                    for cnt in range(frame_length):
-                        int_revData[cnt] = int.from_bytes(revData[cnt],byteorder='big',signed=False)
-            else:
-                pass
-                
+                    break
+                else:
+                    portNotFound = False
+
             if(one_frame_received == True):
-                #CRCvalidating prosedure
+                #CheckSum prosedure
                 sumUp = 0
                 CRC_validation_passed = 0
                 for cnt in range(frame_length - 3):
@@ -126,7 +128,7 @@ if __name__ == '__main__':
                 real_attitude.longitude = int.from_bytes(attitude_buff.longitude,byteorder='big',signed=False)/1e7
                 real_attitude.latitude = int.from_bytes(attitude_buff.latitude,byteorder='big',signed=False)/1e7
                 pub.publish(real_attitude)
-            #rate.sleep()
+            rate.sleep()
     except rospy.ROSInterruptException:
         ser.close()
         print("Node shuting down")
