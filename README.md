@@ -1,6 +1,6 @@
-无人船上位机端程序
+无人载具上位机端程序
 ================
-此package为使用ROS为框架开发的无人船上位机程序。目前正在开发阶段，功能尚未完成。使用ROS的主要目的在于试图消除因不同硬件平台带来的低通用性。在Kinetic、Melodic等版本的ROS上；在Nvidia TX系列、树莓派、PC等Ubuntu系统的平台上无差别运行。
+此package为使用ROS为框架开发的无人载具上位机程序。目前正在开发阶段，功能尚未完成。使用ROS的主要目的在于试图消除因不同硬件平台带来的低通用性。在Kinetic、Melodic等版本的ROS上；在Nvidia TX系列、树莓派、PC等Ubuntu系统的平台上无差别运行。
 
 ****
 
@@ -21,7 +21,7 @@
 
 ## 开发进度
 * main_sequence package
-包内主要涵盖：路径规划、上位机与下位机的通信（基于Eastar protocol协议，若需要协议框图请联系开发者）
+包内主要涵盖：路径规划、上位机与下位机的通信（基于自创Eastar protocol协议，协议处于测试阶段。若需要协议框图请联系开发者）
   * control_mode_hub.py--驱动系统状态切换的switcher.遥控器可选择手动操作模式、自动导航模式、计点模式，switcher的作用即接收遥控器模式的切换，并且通知相应server进行相关操作。
   * eastar_protocol.py--系统的串口操作hub.所有串口的输入输出脚本均在此脚本中进行
   * navigation_action_server.py--系统的core组件。负责实际路径的规划、GPS坐标点的记录等核心操作。
