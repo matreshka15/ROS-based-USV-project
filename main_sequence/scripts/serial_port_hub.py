@@ -64,7 +64,7 @@ if __name__ == '__main__':
         rospy.init_node('serial_port_hub',anonymous=True)
         #fetch parameters
         baudrate = rospy.get_param('~baudrate')
-        serial_port = rospy.get_param('~serial_port')
+        SERIALPORT = rospy.get_param('~serial_port')
         #initiate
         rospy.Subscriber('navigation_data_publisher',route,callback)
         rate = rospy.Rate(10) #5Hz
