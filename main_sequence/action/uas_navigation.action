@@ -1,0 +1,10 @@
+#goal
+uint8 navigation_mode
+uint8 control_mode
+---
+#result
+---
+#feedback
+uint32 current_index
+float64 current_latitude
+float64 current_longitude
