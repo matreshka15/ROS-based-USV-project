@@ -3,9 +3,13 @@ import rospy
 import serial
 #message type:include almost all GPS\Imu data needed
 from main_sequence.msg import *
-from variable import *
 #configuration
 frame_length = 22
+
+#fetch parameters
+baudrate = rospy.get_param('~baudrate')
+serial_port = rospy.get_param('~serial_port')
+
 
 class attitude_buff():
     latitude = 0

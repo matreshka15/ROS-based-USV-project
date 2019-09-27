@@ -4,13 +4,14 @@ RECORD_LOCATION = "../workingfile/"
 from library import AziFromPos
 from library import Record_Coordinates
 from constant_params import *
-from variable import *
 import actionlib
 from main_sequence.msg import *
 import rospy
 import math
 import os
 
+#fetch parameters
+MaxDistance = rospy.get_param('~MaxDistance')
 #define global variables
 class navigation_data():
     latitude = 0
