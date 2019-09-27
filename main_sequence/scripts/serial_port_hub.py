@@ -6,9 +6,7 @@ from main_sequence.msg import *
 #configuration
 frame_length = 22
 
-#fetch parameters
-baudrate = rospy.get_param('~baudrate')
-serial_port = rospy.get_param('~serial_port')
+
 
 
 class attitude_buff():
@@ -64,6 +62,10 @@ if __name__ == '__main__':
     try:
         pub = rospy.Publisher('attitude_info',attitude,queue_size=10)
         rospy.init_node('serial_port_hub',anonymous=True)
+        #fetch parameters
+        baudrate = rospy.get_param('~baudrate')
+        serial_port = rospy.get_param('~serial_port')
+        #initiate
         rospy.Subscriber('navigation_data_publisher',route,callback)
         rate = rospy.Rate(10) #5Hz
         print("Initiating phase 1")

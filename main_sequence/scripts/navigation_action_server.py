@@ -10,8 +10,7 @@ import rospy
 import math
 import os
 
-#fetch parameters
-MaxDistance = rospy.get_param('~MaxDistance')
+
 #define global variables
 class navigation_data():
     latitude = 0
@@ -155,6 +154,8 @@ CWD = os.getcwd()
 
 if __name__ == '__main__':
     rospy.init_node('main_execute_module',anonymous=True)
+    #fetch parameters
+    MaxDistance = rospy.get_param('~MaxDistance')
     #start nav data listener
     rospy.Subscriber('nav_action_listener',attitude,subscriber_callback)
     pub = rospy.Publisher('navigation_route',route,queue_size=5)
