@@ -55,6 +55,7 @@ for cnt in range(frame_length):
     int_revData.append(0)
 
 
+timeCounter = 0
 if __name__ == '__main__':
     try:
         pub = rospy.Publisher('attitude_info',attitude,queue_size=10)
@@ -80,7 +81,7 @@ if __name__ == '__main__':
                     portNotFound = False
                     for cnt2 in range(frame_length - 1):
                         revData[1+cnt2] = ser.read(1)#Byte型
-                    if(b's' in revData and b'c' in revData[2:]):
+                    if(b'sc' in revData[2:]):
                         break
                     for cnt3 in range(frame_length):#int型
                         int_revData[cnt3] = int.from_bytes(revData[cnt3],byteorder='big',signed=False)
@@ -100,7 +101,8 @@ if __name__ == '__main__':
                     CRC_validation_passed = True
                 else:
                     CRC_validation_passed = False
-                                        
+                    print("sumUp = %d,CheckSum = %d"%(sumUp,int_revData[frame_length - 1]))
+                    print(int_revData)
             if(CRC_validation_passed == True):
                 #Interpret data into NavSatFix
                 attitude_buff.longitude = bytes()
@@ -108,10 +110,10 @@ if __name__ == '__main__':
                 attitude_buff.yaw = bytes()
                 attitude_buff.pitch = bytes()
                 attitude_buff.roll = bytes()
-                attitude_buff.hAcc = revData[16]
+                attitude_buff.hAcc = bytes(revData[16])
                 #control field
-                attitude_buff.fixtype = revData[20]
-                attitude.control_mode = revData[20]
+                attitude_buff.fixtype = bytes(revData[20])
+                attitude_buff.control_mode = bytes(revData[20])
                 for cnt in range(4):
                     attitude_buff.longitude += revData[cnt+2]
                     attitude_buff.latitude += revData[cnt+2+4]
@@ -128,7 +130,12 @@ if __name__ == '__main__':
                 real_attitude.longitude = int.from_bytes(attitude_buff.longitude,byteorder='big',signed=False)/1e7
                 real_attitude.latitude = int.from_bytes(attitude_buff.latitude,byteorder='big',signed=False)/1e7
                 pub.publish(real_attitude)
+            timeCounter += 1
+            if(timeCounter>=100):#report status every (number) seconds
+                print("serial port hub working.")
+                timeCounter = 0
             rate.sleep()
+
     except rospy.ROSInterruptException:
         ser.close()
         print("Node shuting down")

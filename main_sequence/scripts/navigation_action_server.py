@@ -134,7 +134,7 @@ def navigation(goal):
                 else:
                     prvRoute.EndOfNav = 0
                     nextPoint += 1
-                        
+                
                 nav_feedback.current_index = nextPoint
                 nav_feedback.current_latitude = nav_action_data.latitude
                 nav_feedback.current_longitude = nav_action_data.longitude
@@ -160,5 +160,5 @@ if __name__ == '__main__':
     rate = rospy.Rate(5) #5Hz
     server = actionlib.SimpleActionServer('GPS_nav',uas_navigationAction,navigation,False)
     server.start()
-    print("nav_center:all module successfully start up")
+    print("nav_center:all module successfully started up")
     rospy.spin()
