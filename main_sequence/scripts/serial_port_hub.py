@@ -68,7 +68,7 @@ if __name__ == '__main__':
         #initiate
         rospy.Subscriber('navigation_data_publisher',route,callback)
         rate = rospy.Rate(10) #5Hz
-        print("Initiating phase 1")
+        print("SERIAL:Initiating phase 1")
         #timeout protection
         ser = serial.Serial(SERIALPORT,baudrate,timeout=1)
         print(ser)
@@ -81,8 +81,8 @@ if __name__ == '__main__':
                 if revData[0] == b'':
                     if(portNotFound == False):
                         portNotFound = True
-                        print("No data coming in serial port.")
-                        print("Please check port:",ser.name)
+                        print("SERIAL:No data coming in serial port.")
+                        print("SERIAL:Please check port:",ser.name)
                 elif revData[0] == b's':
                     portNotFound = False
                     for cnt2 in range(frame_length - 1):
@@ -107,7 +107,7 @@ if __name__ == '__main__':
                     CRC_validation_passed = True
                 else:
                     CRC_validation_passed = False
-                    print("sumUp = %d,CheckSum = %d"%(sumUp,int_revData[frame_length - 1]))
+                    print("SERIAL:sumUp = %d,CheckSum = %d"%(sumUp,int_revData[frame_length - 1]))
                     print(int_revData)
             if(CRC_validation_passed == True):
                 #Interpret data into NavSatFix
@@ -138,12 +138,12 @@ if __name__ == '__main__':
                 pub.publish(real_attitude)
             timeCounter += 1
             if(timeCounter>=100):#report status every (number) seconds
-                print("serial port hub working.")
+                print("SERIAL:serial port hub working.")
                 timeCounter = 0
             rate.sleep()
 
     except rospy.ROSInterruptException:
         ser.close()
-        print("Node shuting down")
+        print("SERIAL:Node shuting down")
 
 
