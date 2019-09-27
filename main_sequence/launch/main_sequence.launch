@@ -3,14 +3,17 @@
  -->
 
 <launch>
+
     <node name="serial_port_hub" pkg = "main_sequence" type = "serial_port_hub.py" >
 		<param name="serial_port" value="/dev/ttyTHS2" type="str" />
 		<param name="baudrate" value="115200" type="int" />
 	 </node>
-    <node name="main_execute_module" pkg = "main_sequence" type = "navigation_action_server.py"  >
-		<!--The maximum distance, on which strategies to approach will take.-->
+
+    <node name="main_execute_module" pkg = "main_sequence" type = "navigation_action_server.py" >
+		<!-- The maximum distance, on which strategies to approach will take. -->
 		<param name="MaxDistance" value="100" type="int" />
 	 </node>
-	<node name="control_hub" pkg = "main_sequence" type = "control_mode_hub.py"  >
-	 </node>
+
+	<node name="control_hub" pkg = "main_sequence" type = "control_mode_hub.py"/>
+
 </launch>
