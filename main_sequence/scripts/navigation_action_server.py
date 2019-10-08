@@ -4,12 +4,12 @@ RECORD_LOCATION = "../workingfile/"
 from library import AziFromPos
 from library import Record_Coordinates
 from constant_params import *
-from variable import *
 import actionlib
 from main_sequence.msg import *
 import rospy
 import math
 import os
+
 
 #define global variables
 class navigation_data():
@@ -45,12 +45,12 @@ def acquire_mapdata():
                     Position1 = float(line[:endIndex])
                     Mapdata[name] = [Position0,Position1]
             for key in Mapdata.keys():
-                print("Point#%d:%s"%(key,str(Mapdata[key])))
-            print("%d Points In Total."%len(Mapdata.keys()))
+                print("NAV:Point#%d:%s"%(key,str(Mapdata[key])))
+            print("NAV: %d Points In Total."%len(Mapdata.keys()))
         else:
-            print('Warning:Mapdata Empty!')
+            print('NAV:Warning:Mapdata Empty!')
     except FileNotFoundError:
-        print("Map Data Not Found!")
+        print("NAV:Map Data Not Found!")
     return Mapdata
 
        
@@ -74,17 +74,17 @@ def navigation(goal):
             index = 0
             os.chdir(RECORD_LOCATION)
             Coordinates_Saving_File = open(("LatLong_Record.txt"),"w+")
-            print("Coordinate Saving File Created.")
-            print("Recording Coordinates")
+            print("NAV:Coordinate Saving File Created.")
+            print("NAV:Recording Coordinates")
             while not server.is_preempt_requested():
                 index += 1
                 time.sleep(1)#采点时间间隔设置
                 Record_Coordinates.start(Coordinates_Saving_File,index,nav_action_data.longitude,nav_action_data.latitude,0)
             Coordinates_Saving_File.close()
-            print('%d Coordinate(s) saved'%index)
+            print('NAV:%d Coordinate(s) saved'%index)
             os.rename('LatLong_Record.txt','LatLong.txt')
             os.chdir(CWD)#switch back to original working directory
-            server.set_preempted(nav_result,"New Coordinates Saved")
+            server.set_preempted(nav_result,"NAV:New Coordinates Saved")
         else:
             print("GPS not fixed")
     elif(goal.control_mode == control_auto):
@@ -106,7 +106,7 @@ def navigation(goal):
             nextPoint = indexMin
             while True:
                 if(server.is_preempt_requested()):
-                    server.set_preempted(nav_feedback,'GPS Navigation Halt')
+                    server.set_preempted(nav_feedback,'NAV:GPS Navigation Halt')
                     break
                 
                 #After this part of function,initial start point will be selected
@@ -128,7 +128,7 @@ def navigation(goal):
                     while not server.is_preempt_requested():
                         pass
                     else:
-                        server.set_preempted(nav_result,'GPS Navigation Halt')
+                        server.set_preempted(nav_result,'NAV:GPS Navigation Halt')
                         break
                     break
                 else:
@@ -146,7 +146,7 @@ def navigation(goal):
                 pub.publish(nav_route)
                 rate.sleep()
         else:
-            print("GPS not fixed")
+            print("NAV:GPS not fixed")
 
 
 #Initial working directory
@@ -154,11 +154,13 @@ CWD = os.getcwd()
 
 if __name__ == '__main__':
     rospy.init_node('main_execute_module',anonymous=True)
+    #fetch parameters
+    MaxDistance = rospy.get_param('~MaxDistance')
     #start nav data listener
     rospy.Subscriber('nav_action_listener',attitude,subscriber_callback)
     pub = rospy.Publisher('navigation_route',route,queue_size=5)
     rate = rospy.Rate(5) #5Hz
     server = actionlib.SimpleActionServer('GPS_nav',uas_navigationAction,navigation,False)
     server.start()
-    print("nav_center:all module successfully started up")
+    print("NAV:nav_center:all module successfully started up")
     rospy.spin()
