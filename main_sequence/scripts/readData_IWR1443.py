@@ -24,12 +24,12 @@ def serialConfig(configFileName):
     # Open the serial ports for the configuration and the data ports
     
     # Raspberry pi
-    #CLIport = serial.Serial('/dev/ttyACM0', 115200)
-    #Dataport = serial.Serial('/dev/ttyACM1', 921600)
+    CLIport = serial.Serial('/dev/ttyACM0', 115200)
+    Dataport = serial.Serial('/dev/ttyACM1', 921600)
     
     # Windows
-    CLIport = serial.Serial('COM21', 115200)
-    Dataport = serial.Serial('COM22', 921600)
+    #CLIport = serial.Serial('COM21', 115200)
+    #Dataport = serial.Serial('COM22', 921600)
 
     # Read the configuration file and send it to the board
     config = [line.rstrip('\r\n') for line in open(configFileName)]
@@ -144,11 +144,12 @@ def readAndParseData14xx(Dataport, configParameters):
                     byteBuffer[:byteBufferLength-startIdx[0]] = byteBuffer[startIdx[0]:byteBufferLength]
                     byteBufferLength = byteBufferLength - startIdx[0]
                 except:
-                    print(len(byteBuffer[:byteBufferLength-startIdx[0]]))
-                    print(byteBuffer[:byteBufferLength-startIdx[0]])
-                    print('--------------------------------------')
-                    print(len(byteBuffer[startIdx[0]:byteBufferLength]))
-                    print(byteBuffer[startIdx[0]:byteBufferLength])
+                    pass
+                    #print(len(byteBuffer[:byteBufferLength-startIdx[0]]))
+                    #print(byteBuffer[:byteBufferLength-startIdx[0]])
+                    #print('--------------------------------------')
+                    #print(len(byteBuffer[startIdx[0]:byteBufferLength]))
+                    #print(byteBuffer[startIdx[0]:byteBufferLength])
             # Check that there have no errors with the byte buffer length
             if byteBufferLength < 0:
                 byteBufferLength = 0
@@ -200,12 +201,8 @@ def readAndParseData14xx(Dataport, configParameters):
             word = [1, 2**8, 2**16, 2**24]
 
             # Check the header of the TLV message
-            try:
-                tlv_type = np.matmul(byteBuffer[idX:idX+4],word)
-                idX += 4
-            except:
-                print(byteBuffer[idX:idX+4])
-                print("byteBuffer[idX:idX+4]")
+            tlv_type = np.matmul(byteBuffer[idX:idX+4],word)
+            idX += 4
             tlv_length = np.matmul(byteBuffer[idX:idX+4],word)
             idX += 4
             
@@ -261,8 +258,8 @@ def readAndParseData14xx(Dataport, configParameters):
                 dataOK = 1
 
                 
-                #print(detObj['range'].mean())
-                
+                print(detObj['range'].mean())
+                #print(detObj['range'])
             else:
                 idX += tlv_length
                 
@@ -285,25 +282,28 @@ def readAndParseData14xx(Dataport, configParameters):
     return dataOK, frameNumber, detObj
 
 # ------------------------------------------------------------------
-
 # Funtion to update the data and display in the plot
-def update():
-     
+def update(cycleCounter): # new plot will be plotted when cycleCounter equals DRAWCYCLE
+    
     dataOk = 0
     global detObj
     x = []
     y = []
-      
+    x_buff = []
     # Read and parse the received data
-    dataOk, frameNumber, detObj = readAndParseData14xx(Dataport, configParameters)
-    
+    try:
+        dataOk, frameNumber, detObj = readAndParseData14xx(Dataport, configParameters)
+    except Exception as e:
+        print("Error",e)
     if dataOk:
         #print(detObj)
         x = -detObj["x"]
         y = detObj["y"]
-        
-    s.setData(x,y)
-    QtGui.QApplication.processEvents()
+        x_buff =np.hstack((x_buff,x))
+        print(x_buff)
+    if(cycleCounter > DRAWCYCLE-cycle): # time limit met,start processing data
+        s.setData(x,y)
+        QtGui.QApplication.processEvents()
     
     return dataOk
 
@@ -334,18 +334,22 @@ s = p.plot([],[],pen=None,symbol='o')
 detObj = {}  
 frameData = {}    
 currentIndex = 0
+cycleCounter = 0
+DRAWCYCLE = 0.1
+cycle = 0.01
 while True:
     try:
         # Update the data and check if the data is okay
-        dataOk = update()
+        dataOk = update(cycleCounter)
         
         if dataOk:
             # Store the current frame into frameData
             frameData[currentIndex] = detObj
             currentIndex += 1
-        
-        time.sleep(0.033) # Sampling frequency of 30 Hz
-        
+        if(cycleCounter > DRAWCYCLE-cycle):
+            cycleCounter = 0
+        time.sleep(cycle) # Sampling frequency of 1/cycle Hz
+        cycleCounter += cycle
     # Stop the program and close everything if Ctrl + c is pressed
     except KeyboardInterrupt:
         CLIport.write(('sensorStop\n').encode())
