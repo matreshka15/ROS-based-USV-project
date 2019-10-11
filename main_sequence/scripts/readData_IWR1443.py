@@ -2,6 +2,8 @@ import serial
 import time
 import numpy as np
 import pyqtgraph as pg
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 from pyqtgraph.Qt import QtGui
 
 # Change the configuration file name
@@ -137,7 +139,6 @@ def readAndParseData14xx(Dataport, configParameters):
                
         # Check that startIdx is not empty
         if startIdx:
-            
             # Remove the data before the first start index
             if startIdx[0] > 0:
                 try:
@@ -258,7 +259,7 @@ def readAndParseData14xx(Dataport, configParameters):
                 dataOK = 1
 
                 
-                print(detObj['range'].mean())
+                #print(detObj['range'].mean())
                 #print(detObj['range'])
             else:
                 idX += tlv_length
@@ -283,13 +284,25 @@ def readAndParseData14xx(Dataport, configParameters):
 
 # ------------------------------------------------------------------
 # Funtion to update the data and display in the plot
-def update(cycleCounter): # new plot will be plotted when cycleCounter equals DRAWCYCLE
+def update(READY2PROCESS): # new plot will be plotted when cycleCounter equals DRAWCYCLE
     
     dataOk = 0
     global detObj
+    global pointsComing
+    global pointsLeaving
     x = []
     y = []
-    x_buff = []
+    z = []
+    X = []
+    Xcoming=[]
+    Xleaving=[]
+    Y = []
+    Ycoming=[]
+    Yleaving=[]
+    Z = []
+    Zcoming=[]
+    Zleaving=[]
+    DopplerIdx = []
     # Read and parse the received data
     try:
         dataOk, frameNumber, detObj = readAndParseData14xx(Dataport, configParameters)
@@ -297,14 +310,37 @@ def update(cycleCounter): # new plot will be plotted when cycleCounter equals DR
         print("Error",e)
     if dataOk:
         #print(detObj)
-        x = -detObj["x"]
-        y = detObj["y"]
-        x_buff =np.hstack((x_buff,x))
-        print(x_buff)
-    if(cycleCounter > DRAWCYCLE-cycle): # time limit met,start processing data
-        s.setData(x,y)
+        #x = -detObj["x"]
+        #y = detObj["y"]
+        #z = detObj["z"]
+        if(READY2PROCESS == True):
+            # Collect Data
+            for cnt in range(len(frameData)):
+                X=np.hstack((X,-frameData[cnt]["x"]))
+                Y=np.hstack((Y,frameData[cnt]["y"]))
+                Z=np.hstack((Z,frameData[cnt]["z"]))
+                DopplerIdx =np.hstack((DopplerIdx,frameData[cnt]["doppler"]))
+            #DataCollected. Classify or Process Data
+            #classify different moving direction
+            for index in range(len(DopplerIdx)):
+                if(DopplerIdx[index] > 0):
+                    Xcoming = np.hstack((Xcoming,X[index]))
+                    Ycoming = np.hstack((Ycoming,Y[index]))
+                    Zcoming = np.hstack((Zcoming,Z[index]))
+                else:
+                    Xleaving = np.hstack((Xleaving,X[index]))
+                    Yleaving = np.hstack((Yleaving,Y[index]))
+                    Zleaving = np.hstack((Zleaving,Z[index]))
+            #Plot Data
+            if(FIGURE3D == True):
+                pointsComing.remove()
+                pointsLeaving.remove()
+                pointsComing = plot3d.scatter(Xcoming,Ycoming,Zcoming,c='r',s=3)
+                pointsLeaving = plot3d.scatter(Xleaving,Yleaving,Zleaving,c='b',s=3)
+                plt.draw()
+            if(FIGURE2D == True):
+                s.setData(X,Y)
         QtGui.QApplication.processEvents()
-    
     return dataOk
 
 
@@ -312,50 +348,96 @@ def update(cycleCounter): # new plot will be plotted when cycleCounter equals DR
 
 # Configurate the serial port
 CLIport, Dataport = serialConfig(configFileName)
-
+#Congigurate the display of plot(3D\2D)
+FIGURE3D= 1 # Quite slow plotting
+FIGURE2D= 0 # 2D ploting is way faster
 # Get the configuration parameters from the configuration file
 configParameters = parseConfigFile(configFileName)
 
-# START QtAPPfor the plot
-app = QtGui.QApplication([])
+# Prepare for plotting
+if(FIGURE2D or FIGURE3D):
+    # START QtAPPfor the plot
+    app = QtGui.QApplication([])
+#Start 2D plotting(faster than matplotlib)
+if(FIGURE2D==True):
+    # Set the plot 
+    pg.setConfigOption('background','w')
+    win = pg.GraphicsWindow(title="2D scatter plot")
+    p = win.addPlot()
+    p.setXRange(-0.5,0.5)
+    p.setYRange(0,1.5)
+    p.setLabel('left',text = 'Y position (m)')
+    p.setLabel('bottom', text= 'X position (m)')
+    s = p.plot([],[],pen=None,symbol='+')
 
-# Set the plot 
-pg.setConfigOption('background','w')
-win = pg.GraphicsWindow(title="2D scatter plot")
-p = win.addPlot()
-p.setXRange(-0.5,0.5)
-p.setYRange(0,1.5)
-p.setLabel('left',text = 'Y position (m)')
-p.setLabel('bottom', text= 'X position (m)')
-s = p.plot([],[],pen=None,symbol='o')
-    
-   
-# Main loop 
-detObj = {}  
-frameData = {}    
+#matplotlib
+if(FIGURE3D==True):
+    plt.ion()
+    plot3d = plt.subplot(111,projection='3d')
+    plot3d.set_zlabel('Z')
+    plot3d.set_ylabel('Y')
+    plot3d.set_xlabel('X')
+    plot3d.set_zlim(0,2)
+    plt.xlim(-0.5,0.5)
+    plt.ylim(0,1.5)
+    origin = plot3d.scatter(0,0,0,c='b')
+    pointsComing = plot3d.scatter(0,0,0,c='r')
+    pointsLeaving = plot3d.scatter(0,0,0,c='b')
+
+# Set Params for radar data processing
+
+#System params
+READY2PROCESS = 0
+# Main loop
+detObj = {}
+frameData = {}
 currentIndex = 0
 cycleCounter = 0
-DRAWCYCLE = 0.1
 cycle = 0.01
+RunUponStart = True # Enable scripts to run on start
+# Set the time span between plotting
+# which thus also sets the frames radar used for data processing.
+DRAWCYCLE = 0.1
+#Set the Sampling time
+RadarProcessFrame = int(DRAWCYCLE / cycle)
+print("Data will be processed with %d frames prepared"%(RadarProcessFrame))
+
 while True:
     try:
         # Update the data and check if the data is okay
-        dataOk = update(cycleCounter)
-        
+        dataOk = update(READY2PROCESS)
         if dataOk:
+            if(RunUponStart):
+                print("Analysing data:")
+                for key in detObj.keys():
+                    print(key) 
             # Store the current frame into frameData
             frameData[currentIndex] = detObj
             currentIndex += 1
+            if(currentIndex >= RadarProcessFrame):
+                currentIndex = 0
+                frameData = {}
+                frameData[currentIndex] = detObj
+                currentIndex += 1
+            elif(currentIndex == RadarProcessFrame-1):
+                READY2PROCESS = 1
+            else:
+                READY2PROCESS = 0
+
         if(cycleCounter > DRAWCYCLE-cycle):
             cycleCounter = 0
         time.sleep(cycle) # Sampling frequency of 1/cycle Hz
         cycleCounter += cycle
-    # Stop the program and close everything if Ctrl + c is pressed
+        RunUponStart = 0
+# Stop the program and close everything if Ctrl + c is pressed
     except KeyboardInterrupt:
         CLIport.write(('sensorStop\n').encode())
         CLIport.close()
         Dataport.close()
-        win.close()
+        if(FIGURE2D):
+            win.close()
+        if(FIGURE3D):
+            plt.close()
         break
         
     
