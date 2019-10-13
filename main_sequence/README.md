@@ -13,6 +13,18 @@
 sudo nano /etc/systemd/resolved.conf  
 修改好了之后：systemctl restart systemd-resolved.service
 
+* 加速访问GitHub
+http://tool.chinaz.com/dns/  
+查询以下域名映射,并分别取访问速度较快的一个ip  
+github.global.ssl.fastly.net   ->   
+assets-cdn.github.com        ->  
+TTL值越大证明响应速度越快（“TTL”的值越大越好才对，因为“TTL”的值越大，说明发送数据包经过路由器越少，而经过路由器越少，说明越快到达目的地，速度当然也就越快。）  
+将查询到的ip和域名设置到host中sudo gedit /etc/hosts  
+ 在hosts中加入查询结果
+151.101.229.194  github.global.ssl.fastly.net  
+203.208.39.99 assets-cdn.github.com  
+保存,退出,并重启网络  
+/etc/init.d/networking restart  
 * 创建swap空间
 $ sudo fallocate -l 8G /mnt/8GB.swap  
 $ sudo mkswap /mnt/8GB.swap  
