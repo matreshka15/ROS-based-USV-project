@@ -57,5 +57,6 @@ deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/ bionic-security main 
 * OpenGl模组
 apt-get install python3-pyqt4.qtopengl  
 pip3 install PyOpenGl PyOpenGl_accerate  
-
+* PyQt5模块
+pip3 install python-qt5
 -----------------
