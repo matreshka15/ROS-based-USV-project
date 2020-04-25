@@ -7,6 +7,11 @@
 ## 概述
 本package运行在运行ROS的上位机中，通过串口与下位机(STM32F103ZE)相连接；下位机负责动力控制、姿态解算与遥控信号接收等功能，上位机负责自动导航模式的路径规划。
 * [下位机端工程文件Github仓库](https://github.com/matreshka15/UAS-Project-STM32)
+### 重要！所有开发下位机过程中的开发日志以及手册均已存放在下面地址
+* [开发无人船过程中参考的传感器手册以及算法资料](https://github.com/matreshka15/unmanned-ship-datasheets)
+* 开发日志记录了项目从一开始的立项到后面一步步测试成功的大大小小细节。前后由于放弃了旧的姿态算法、选取了新的姿态算法，因此前期关于姿态的说明仅供参考用。
+* 通信协议的部分已摘抄出来，放在超链接处的Repo目录下。即：整体框架与通信协议.docx
+
 ## 开发环境
 初期在Nvidia Jetson TX1开发板上进行开发。(系统：Ubuntu 18.04；ROS版本：melodic)，与ROS kinetic兼容性有待测试。但实际开发过程中发现在Kinetic平台未报错误。
 开发中期使用Nvidia Jetson Nano, 由于Nvidia官方社区支持Ubuntu版本为18.04，因此本Project将专注在ROS melodic平台上开发。
