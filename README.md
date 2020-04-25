@@ -32,12 +32,9 @@
   * constant_params.py--系统常量存放处。
   * 注意--串口等设置参数。均在参数服务器中，在launch文件内修改。
 
-## 开发者的话
-****
+## 联系开发者
 
-|Author|Estello|
+|Author|Eastello|
 |---|---
-|E-mail|matreshka15@icloud.com
-
-Estello.club-- A self-supported newly-born geek club
+|E-mail|8523429@qq.com
 ****
