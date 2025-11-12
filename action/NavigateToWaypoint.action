@@ -1,0 +1,17 @@
+# 导航到航点动作定义
+
+# 目标：包含一系列航点的经纬度坐标
+geometry_msgs/Point[] waypoints
+
+---
+# 结果：导航完成状态和消息
+bool success
+string message
+
+---
+# 反馈：当前导航状态
+float64 current_latitude
+float64 current_longitude
+float64 distance_to_waypoint
+int32 waypoint_index
+int32 total_waypoints

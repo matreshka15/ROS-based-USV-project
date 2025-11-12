@@ -1,0 +1,19 @@
+[Unit]
+Description=USV Control System
+After=network.target
+Wants=network.target
+
+[Service]
+Type=simple
+User=ubuntu
+Environment="ROS_DOMAIN_ID=0"
+Environment="ROS_LOCALHOST_ONLY=0"
+Environment="LD_LIBRARY_PATH=/opt/ros/humble/lib:/usr/local/lib"
+ExecStart=/bin/bash -c "source /opt/ros/humble/setup.bash; source /home/ubuntu/usv_ros2_ws/install/setup.bash; ros2 launch usv_control usv_control.launch.py"
+Restart=on-failure
+RestartSec=5
+KillSignal=SIGINT
+TimeoutStopSec=10
+
+[Install]
+WantedBy=multi-user.target

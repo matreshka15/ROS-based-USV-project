@@ -1,0 +1,92 @@
+# USV控制配置文件
+# 基于ROS 2 Humble
+
+# 串口配置
+serial:
+  port: "/dev/ttyUSB0"
+  baudrate: 115200
+  timeout: 0.1
+
+# 雷达配置
+radar:
+  port: "/dev/ttyUSB1"
+  baudrate: 921600
+  safety_distance: 3.0  # 安全距离 (米)
+
+# 控制参数
+control:
+  frequency: 50.0       # 控制频率 (Hz)
+  max_thrust: 100.0     # 最大推力百分比
+  max_yaw_rate: 45.0    # 最大偏航率 (度/秒)
+  max_speed: 2.0        # 最大速度 (米/秒)
+
+# 导航参数
+navigation:
+  waypoint_tolerance: 1.0  # 航点到达容差 (米)
+  kp_distance: 0.5         # 距离控制器比例系数
+  kp_heading: 2.0          # 航向控制器比例系数
+  max_angular_velocity: 30.0  # 最大角速度 (度/秒)
+
+# PID控制器参数
+pid:
+  linear:
+    p: 0.5
+    i: 0.1
+    d: 0.05
+  angular:
+    p: 2.0
+    i: 0.5
+    d: 0.1
+
+# 坐标系配置
+tf:
+  base_link: "base_link"
+  imu_link: "imu_link"
+  gps_link: "gps_link"
+  radar_link: "radar_link"
+  camera_link: "camera_link"
+
+# 传感器配置
+sensors:
+  imu:
+    topic: "/usv/sensor/imu"
+    frame_id: "imu_link"
+  gps:
+    topic: "/usv/sensor/gps"
+    frame_id: "gps_link"
+  radar:
+    topic: "/usv/sensor/radar"
+    frame_id: "radar_link"
+
+# 话题名称配置
+topics:
+  control_cmd: "/usv/control/cmd_vel"
+  control_mode: "/usv/control/mode"
+  navigation_waypoint: "/usv/navigation/waypoint"
+  navigation_status: "/usv/navigation/status"
+  system_status: "/usv/system/status"
+
+# 服务名称配置
+services:
+  set_mode: "/usv/control/set_mode"
+  go_to_waypoint: "/usv/navigation/go_to_waypoint"
+  start_navigation: "/usv/navigation/start"
+  stop_navigation: "/usv/navigation/stop"
+
+# 动作名称配置
+actions:
+  navigation: "/usv/navigation/navigate"
+
+# 日志配置
+logging:
+  level: "INFO"  # DEBUG, INFO, WARNING, ERROR, CRITICAL
+  console_output: true
+  file_output: false
+  log_file: "/var/log/usv_control.log"
+
+# 安全配置
+safety:
+  emergency_stop_timeout: 5.0  # 紧急停止超时时间 (秒)
+  low_battery_threshold: 0.2   # 低电量阈值
+  critical_battery_threshold: 0.1  # 严重低电量阈值
+  obstacle_avoidance: true     # 启用避障功能
