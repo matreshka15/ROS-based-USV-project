@@ -73,7 +73,7 @@ class Colors:
     CYAN = '\033[96m'
     RESET = '\033[0m'
 
-def print_color(text, color=Colors.WHITE):
+def print_color(text, color=Colors.RESET):
     """带颜色的打印函数"""
     print(f"{color}{text}{Colors.RESET}")
 

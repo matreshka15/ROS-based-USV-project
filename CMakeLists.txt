@@ -26,10 +26,11 @@ rosidl_generate_interfaces(${PROJECT_NAME}
 )
 
 # 设置Python路径
-ament_python_install_package(${PROJECT_NAME})
+# ament_python_install_package(${PROJECT_NAME})
 
 # 安装Python脚本
 install(PROGRAMS
+  scripts/constant_params.py
   scripts/control_mode_hub.py
   scripts/navigation_action_server.py
   scripts/serial_port_hub.py
